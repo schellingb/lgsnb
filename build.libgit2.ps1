@@ -43,6 +43,7 @@ function Run-Command([scriptblock]$Command, [switch]$Fatal, [switch]$Quiet) {
     if ($Quiet) {
         $output = & $Command 2>&1
     } else {
+        Write-Host -ForegroundColor yellow "Run Command: $Command"
         & $Command
     }
 
@@ -122,9 +123,9 @@ try {
     Run-Command { & dir libssh2.zip }
     Write-Output "Do: Expand-Archive libssh2.zip D:\Temp\libssh2\ -Force"
     Expand-Archive libssh2.zip D:\Temp\libssh2\ -Force
-    Run-Command { & dir D:\Temp\libssh2\ }
-    Write-Output "Do: $env:Path += ';D:\Temp\libssh2\bin'"
+    Run-Command { & dir D:\Temp\libssh2\* }
     $env:Path += ';D:\Temp\libssh2\bin'
+    Write-Output "env:Path = $env:Path
 
     if ($x86.IsPresent) {
         Write-Output "Building x86..."
