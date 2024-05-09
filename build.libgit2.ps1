@@ -116,9 +116,13 @@ try {
     Run-Command -Quiet { & mkdir build }
     cd build
 
+    Invoke-WebRequest -Uri https://github.com/libgit2/ci-dependencies/releases/download/2023-02-01/libssh2-20230201-amd64.zip -OutFile libssh2.zip
+    Expand-Archive libssh2.zip D:\Temp\libssh2\ -Force 
+    $env:Path += ';D:\Temp\libssh2\bin'
+
     if ($x86.IsPresent) {
         Write-Output "Building x86..."
-        Run-Command -Fatal { & $cmake -A Win32 -D USE_SSH=ON -D USE_HTTPS=Schannel -D "BUILD_TESTS=$build_tests" -D "BUILD_CLI=OFF" -D "LIBGIT2_FILENAME=$binaryFilename"  .. }
+        Run-Command -Fatal { & $cmake -A Win32 -D USE_SSH=ON -DCMAKE_PREFIX_PATH=D:\Temp\libssh2 -D USE_HTTPS=Schannel -D "BUILD_TESTS=$build_tests" -D "BUILD_CLI=OFF" -D "LIBGIT2_FILENAME=$binaryFilename"  .. }
         Run-Command -Fatal { & $cmake --build . --config $configuration }
         if ($test.IsPresent) { Run-Command -Quiet -Fatal { & $ctest -V . } }
         cd $configuration
@@ -134,7 +138,7 @@ try {
         Write-Output "Building x64..."
         Run-Command -Quiet { & mkdir build64 }
         cd build64
-        Run-Command -Fatal { & $cmake -A x64 -D USE_SSH=ON -D USE_HTTPS=Schannel -D "BUILD_TESTS=$build_tests" -D "BUILD_CLI=OFF" -D "LIBGIT2_FILENAME=$binaryFilename" ../.. }
+        Run-Command -Fatal { & $cmake -A x64 -D USE_SSH=ON -DCMAKE_PREFIX_PATH=D:\Temp\libssh2 -D USE_HTTPS=Schannel -D "BUILD_TESTS=$build_tests" -D "BUILD_CLI=OFF" -D "LIBGIT2_FILENAME=$binaryFilename" ../.. }
         Run-Command -Fatal { & $cmake --build . --config $configuration }
         if ($test.IsPresent) { Run-Command -Quiet -Fatal { & $ctest -V . } }
         cd $configuration
@@ -149,7 +153,7 @@ try {
         Write-Output "Building arm64..."
         Run-Command -Quiet { & mkdir buildarm64 }
         cd buildarm64
-        Run-Command -Fatal { & $cmake -A ARM64 -D USE_SSH=ON -D USE_HTTPS=Schannel -D "BUILD_TESTS=$build_tests" -D "BUILD_CLI=OFF" -D "LIBGIT2_FILENAME=$binaryFilename" ../.. }
+        Run-Command -Fatal { & $cmake -A ARM64 -D USE_SSH=ON -DCMAKE_PREFIX_PATH=D:\Temp\libssh2 -D USE_HTTPS=Schannel -D "BUILD_TESTS=$build_tests" -D "BUILD_CLI=OFF" -D "LIBGIT2_FILENAME=$binaryFilename" ../.. }
         Run-Command -Fatal { & $cmake --build . --config $configuration }
         if ($test.IsPresent) { Run-Command -Quiet -Fatal { & $ctest -V . } }
         cd $configuration
