@@ -18,10 +18,10 @@ jobs:
         include:
           - os: windows-2019
             name: win-x86
-            param: -x86 debug
+            param: -x86 -debug
           - os: windows-2019
             name: win-x64
-            param: -x64 debug
+            param: -x64 -debug
       fail-fast: false
     steps:
       - name: Checkout
