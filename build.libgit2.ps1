@@ -116,18 +116,22 @@ try {
     Run-Command -Quiet { & remove-item build -recurse -force -ErrorAction Ignore }
     Run-Command -Quiet { & mkdir build }
     cd build
-
-    Write-Output "Do: Invoke-WebRequest -Uri https://github.com/libgit2/ci-dependencies/releases/download/2023-02-01/libssh2-20230201-amd64.zip -OutFile libssh2.zip"
-    Invoke-WebRequest -Uri https://github.com/libgit2/ci-dependencies/releases/download/2023-02-01/libssh2-20230201-amd64.zip -OutFile libssh2.zip
-    Run-Command { & dir libssh2.zip }
-    Write-Output "Do: Expand-Archive libssh2.zip D:\Temp\libssh2\ -Force"
-    Expand-Archive libssh2.zip D:\Temp\ -Force
-    Run-Command { & dir D:\Temp\libssh2\* }
-    $env:Path += ';D:\Temp\libssh2\bin'
+    
+    #if ($x86.IsPresent) {
+    #    Write-Output "Do: Invoke-WebRequest -Uri https://github.com/libgit2/ci-dependencies/releases/download/2023-02-01-v2/libssh2-20230201-x86.zip -OutFile libssh2.zip"
+    #    Invoke-WebRequest -Uri https://github.com/libgit2/ci-dependencies/releases/download/2023-02-01-v2/libssh2-20230201-x86.zip -OutFile libssh2.zip
+    #}
+    #if ($x64.IsPresent) {
+    #    Write-Output "Do: Invoke-WebRequest -Uri https://github.com/libgit2/ci-dependencies/releases/download/2023-02-01/libssh2-20230201-amd64.zip -OutFile libssh2.zip"
+    #    Invoke-WebRequest -Uri https://github.com/libgit2/ci-dependencies/releases/download/2023-02-01/libssh2-20230201-amd64.zip -OutFile libssh2.zip
+    #}
+    #Expand-Archive libssh2.zip D:\Temp\ -Force
+    #$env:Path += ';D:\Temp\libssh2\bin'
 
     if ($x86.IsPresent) {
         Write-Output "Building x86..."
-        Run-Command -Fatal { & $cmake -A Win32 -D USE_SSH=ON -DCMAKE_PREFIX_PATH=D:\Temp\libssh2 -D USE_HTTPS=Schannel -D "BUILD_TESTS=$build_tests" -D "BUILD_CLI=OFF" -D "LIBGIT2_FILENAME=$binaryFilename"  .. }
+        #Run-Command -Fatal { & $cmake -A Win32 -D USE_SSH=ON -DCMAKE_PREFIX_PATH=D:\Temp\libssh2 -D USE_HTTPS=Schannel -D "BUILD_TESTS=$build_tests" -D "BUILD_CLI=OFF" -D "LIBGIT2_FILENAME=$binaryFilename"  .. }
+	Run-Command -Fatal { & $cmake -A Win32 -D USE_SSH=ON -D USE_HTTPS=WinHTTP -D "BUILD_TESTS=$build_tests" -D "BUILD_CLI=OFF" -D "LIBGIT2_FILENAME=$binaryFilename"  .. }
         Run-Command -Fatal { & $cmake --build . --config $configuration }
         if ($test.IsPresent) { Run-Command -Quiet -Fatal { & $ctest -V . } }
         cd $configuration
@@ -143,7 +147,8 @@ try {
         Write-Output "Building x64..."
         Run-Command -Quiet { & mkdir build64 }
         cd build64
-        Run-Command -Fatal { & $cmake -A x64 -D USE_SSH=ON -DCMAKE_PREFIX_PATH=D:\Temp\libssh2 -D USE_HTTPS=Schannel -D "BUILD_TESTS=$build_tests" -D "BUILD_CLI=OFF" -D "LIBGIT2_FILENAME=$binaryFilename" ../.. }
+        #Run-Command -Fatal { & $cmake -A x64 -D USE_SSH=ON -DCMAKE_PREFIX_PATH=D:\Temp\libssh2 -D USE_HTTPS=Schannel -D "BUILD_TESTS=$build_tests" -D "BUILD_CLI=OFF" -D "LIBGIT2_FILENAME=$binaryFilename" ../.. }
+        Run-Command -Fatal { & $cmake -A x64 -D USE_SSH=ON -D USE_HTTPS=WinHTTP -D "BUILD_TESTS=$build_tests" -D "BUILD_CLI=OFF" -D "LIBGIT2_FILENAME=$binaryFilename" ../.. }
         Run-Command -Fatal { & $cmake --build . --config $configuration }
         if ($test.IsPresent) { Run-Command -Quiet -Fatal { & $ctest -V . } }
         cd $configuration
