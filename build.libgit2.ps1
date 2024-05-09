@@ -116,13 +116,14 @@ try {
     Run-Command -Quiet { & mkdir build }
     cd build
 
-    dir libssh2.zip
     Write-Output "Do: Invoke-WebRequest -Uri https://github.com/libgit2/ci-dependencies/releases/download/2023-02-01/libssh2-20230201-amd64.zip -OutFile libssh2.zip"
     Invoke-WebRequest -Uri https://github.com/libgit2/ci-dependencies/releases/download/2023-02-01/libssh2-20230201-amd64.zip -OutFile libssh2.zip
-    dir libssh2.zip
+    #Run-Command { & curl -s -L https://github.com/libgit2/ci-dependencies/releases/download/2023-02-01/libssh2-20230201-amd64.zip -o libssh2.zip }
+    Run-Command { & dir libssh2.zip }
     Write-Output "Do: Expand-Archive libssh2.zip D:\Temp\libssh2\ -Force"
     Expand-Archive libssh2.zip D:\Temp\libssh2\ -Force
-    dir D:\Temp\libssh2\
+    Run-Command { & dir D:\Temp\libssh2\ }
+    Write-Output "Do: $env:Path += ';D:\Temp\libssh2\bin'"
     $env:Path += ';D:\Temp\libssh2\bin'
 
     if ($x86.IsPresent) {
